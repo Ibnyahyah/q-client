@@ -17,7 +17,7 @@ function App() {
   const [formData, setFormData] = React.useState({
     name: "",
     sector: "",
-    agreeWithTerms: "",
+    agreeWithTerms: false,
   });
 
   async function submitHandler(e: React.FormEvent<HTMLFormElement>) {
@@ -26,7 +26,7 @@ function App() {
     if (
       formData.name == "" ||
       formData.sector == "" ||
-      formData.agreeWithTerms == ""
+      !formData.agreeWithTerms
     )
       return;
     try {
@@ -37,7 +37,7 @@ function App() {
         },
         body: JSON.stringify({
           ...formData,
-          agreeWithTerms: formData.agreeWithTerms == "on" ? true : false,
+          agreeWithTerms: formData.agreeWithTerms ? true : false,
         }),
       });
       if (res.ok) {
@@ -46,7 +46,7 @@ function App() {
         setFormData({
           name: "",
           sector: "",
-          agreeWithTerms: "",
+          agreeWithTerms: false,
         });
       }
     } catch (err) {
@@ -152,7 +152,7 @@ function App() {
               id="agreed"
               name="agreeWithTerms"
               onChange={handlerChanges}
-              value={formData.agreeWithTerms}
+              checked={formData.agreeWithTerms}
             />
             Agree to terms
           </label>
