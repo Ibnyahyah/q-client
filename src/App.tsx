@@ -69,7 +69,7 @@ function App() {
       const result = await res.json();
       const sectorsData = [];
       const groupedData = result.data.sectors.reduce(
-        (result, sector: sectorT) => {
+        (result: { [x: string]: sectorT[] }, sector: sectorT) => {
           const group = sector.group;
 
           if (!result[group]) {
