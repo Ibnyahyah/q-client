@@ -19,6 +19,7 @@ function App() {
     sector: "",
     agreeWithTerms: "",
   });
+
   async function submitHandler(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     console.log(formData);
