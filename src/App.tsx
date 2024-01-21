@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
-const BASE_URL = "http://localhost:3330/api/v1";
-// const BASE_URL = "https://q-server.onrender.com/api/v1";
+// const BASE_URL = "http://localhost:3330/api/v1";
+const BASE_URL = "https://q-server.onrender.com/api/v1";
 
 type sectorT = {
   createdAt: string;
