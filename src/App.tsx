@@ -1,5 +1,6 @@
-import React from "react";
-const BASE_URL = "https://q-server.onrender.com/api/v1";
+import React, { useCallback } from "react";
+const BASE_URL = "http://localhost:3330/api/v1";
+// const BASE_URL = "https://q-server.onrender.com/api/v1";
 
 type sectorT = {
   createdAt: string;
@@ -17,8 +18,9 @@ function App() {
   const [formData, setFormData] = React.useState({
     name: "",
     sector: "",
-    agreeWithTerms: false,
+    agreeWithTerms: null,
   });
+  const [applicationID, setApplicationID] = React.useState("");
 
   async function submitHandler(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,23 +33,27 @@ function App() {
       return;
     try {
       const res = await fetch(`${BASE_URL}/applicant`, {
-        method: "POST",
+        method: applicationID ? "PATCH" : "POST",
         headers: {
           "content-type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
-          agreeWithTerms: formData.agreeWithTerms ? true : false,
+          agreeWithTerms: true,
+          applicationID: applicationID ? applicationID : "",
         }),
       });
       if (res.ok) {
         const result = await res.json();
         alert(result.message);
+        setApplicationID(result.id);
+        localStorage.setItem("applicationID", JSON.stringify(result.id));
         setFormData({
           name: "",
           sector: "",
-          agreeWithTerms: false,
+          agreeWithTerms: null,
         });
+        window.location.reload();
       }
     } catch (err) {
       console.log(err);
@@ -97,10 +103,38 @@ function App() {
       console.log(error);
     }
   }
+  const getApplicant = useCallback(async () => {
+    if (applicationID == "") return;
+    try {
+      const res = await fetch(`${BASE_URL}/applicant/${applicationID}`, {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      const result = await res.json();
+      setFormData({
+        name: result.data.applicant.name,
+        sector: result.data.applicant.sector._id,
+        agreeWithTerms: result.data.applicant.agreeWithTerms,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, [applicationID]);
 
   React.useEffect(() => {
     getSelectors();
   }, []);
+
+  React.useEffect(() => {
+    setApplicationID(
+      localStorage.getItem("applicationID")
+        ? JSON.parse(localStorage.getItem("applicationID") ?? "")
+        : ""
+    );
+    getApplicant();
+  }, [applicationID, getApplicant]);
 
   return (
     <>
@@ -152,7 +186,7 @@ function App() {
               id="agreed"
               name="agreeWithTerms"
               onChange={handlerChanges}
-              checked={formData.agreeWithTerms}
+              checked={formData.agreeWithTerms ?? false}
             />
             Agree to terms
           </label>
